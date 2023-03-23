@@ -12,9 +12,8 @@ struct Record {
 		int age;
 	};
 
-	int* index;
-	int maxRecords;
-	int recordCount;
+	int* index; //Array for record indexes
+	int recordCount; //num of records
 	std::string filename = "testData.dat";
 
 	void CreateFile(string filename);
@@ -25,37 +24,44 @@ struct Record {
 
 int main()
 {
-    std::cout << "Hello World!\n";
-
+	//Create file and add some records
 	CreateFile(filename);
-	//PrintFile(filename);
+	//Read records from file and print to console
+	PrintFile(filename);
+	//Get start of each record and populate index array
 	IndexFile(filename);
+	//use index array to print record and index 2
 	PrintRecord(filename, 2);
-
-	
 }
 
 void CreateFile(string filename)
 {
+	//create some records
 	Record* r1 = new Record();
-	Record* r2 = new Record();
-	Record* r3 = new Record();
-
 	r1->name = "Ollie";
 	r1->age = 15;
 	r1->nameSize = (int)r1->name.size();
+
+	Record* r2 = new Record();
 	r2->name = "James";
 	r2->age = 18;
 	r2->nameSize = (int)r2->name.size();
+	
+	Record* r3 = new Record();
 	r3->name = "Ann";
 	r3->age = 25;
 	r3->nameSize = (int)r3->name.size();
 
+	//set record count
 	recordCount = 3;
 
+	//open file to write
 	ofstream outfile(filename, ios::binary);
+
+	//first write the record count
 	outfile.write((char*)&recordCount, sizeof(int));
 
+	//print each record to console then write to file
 	std::cout << "Name: " << r1->name << "Age: " << r1->age << "\n";
 	outfile.write((char*)&r1->nameSize, sizeof(int));
 	outfile.write((char*)r1->name.c_str(), r1->nameSize);
@@ -71,29 +77,35 @@ void CreateFile(string filename)
 	outfile.write((char*)r3->name.c_str(), r3->nameSize);
 	outfile.write((char*)&r3->age, sizeof(int));
 
+	//close file
 	outfile.close();
-
 }
 
 void IndexFile(string filename)
 {
+	//open the file
 	ifstream infile(filename, ios::binary);
+
+	//get the record count
 	infile.read((char*)&recordCount, sizeof(int));
 
+	//setup array with length of recordCount
 	index = new int[recordCount];
 
+	//create placeholder record
 	Record* r = new Record();
 	
+	//for as many records
 	for(int i = 0; i < recordCount; i++)
 	{
+		//store the current location in the file to the array
 		index[i] = infile.tellg();
+
+		//read the rest of the entry
 		infile.read((char*)&r->nameSize, sizeof(int));
 		int size = r->nameSize;
 		char* name1 = new char[size + 1];
-		name1[size] = '\0';
-
 		infile.read((char*)name1, size);
-
 		r->name = name1;
 		infile.read((char*)&r->age, sizeof(int));
 	}
@@ -101,12 +113,16 @@ void IndexFile(string filename)
 
 void PrintRecord(string filename, int record)
 {
+	//open the file
 	ifstream infile(filename, ios::binary);
 
+	//move to the the location for the start of the record as in the index array
 	infile.seekg(index[record]);
 
+	//create a new record
 	Record* r1 = new Record();
 
+	//read the data and update record
 	infile.read((char*)&r1->nameSize, sizeof(int));
 	int size = r1->nameSize;
 	char* name1 = new char[size + 1];
@@ -117,60 +133,40 @@ void PrintRecord(string filename, int record)
 	r1->name = name1;
 	infile.read((char*)&r1->age, sizeof(int));
 
+	//print our finished record
 	PrintRecord(r1);
 
 }
 
 void PrintFile(string filename)
 {
+	//open file to read
 	ifstream infile(filename, ios::binary);
 
+	//get the record count
 	infile.read((char*)&recordCount, sizeof(int));
-
-	std::cout << recordCount << "\n";
-
+	
+	//create placeholder record
 	Record* r1 = new Record();
 	
-	infile.read((char*)&r1->nameSize, sizeof(int));
-	int size = r1->nameSize;
-	char* name1 = new char[size + 1];
-	name1[size] = '\0';
-	
-	infile.read((char*)name1, size);
+	for (int i = 0; i < recordCount; i++)
+	{
+		//read data and store as record
+		infile.read((char*)&r1->nameSize, sizeof(int));
+		int size = r1->nameSize;
+		char* name1 = new char[size + 1];
+		name1[size] = '\0';
 
-	r1->name = name1;
-	infile.read((char*)&r1->age, sizeof(int));
+		infile.read((char*)name1, size);
 
-	PrintRecord(r1);
+		r1->name = name1;
+		infile.read((char*)&r1->age, sizeof(int));
 
-	Record* r2 = new Record();
-	
-	infile.read((char*)&r2->nameSize, sizeof(int));
-	size = r2->nameSize;
-	char* name2 = new char[size + 1];
-	name2[size] = '\0';
+		//print the record
+		PrintRecord(r1);
+	}
 
-	infile.read((char*)name2, size);
-
-	r2->name = name2;
-	infile.read((char*)&r2->age, sizeof(int));
-
-	PrintRecord(r2);
-
-	Record* r3 = new Record();
-
-	infile.read((char*)&r3->nameSize, sizeof(int));
-	size = r3->nameSize;
-	char* name3 = new char[size + 1];
-	name3[size] = '\0';
-
-	infile.read((char*)name3, size);
-
-	r3->name = name3;
-	infile.read((char*)&r3->age, sizeof(int));
-
-	PrintRecord(r3);
-
+	//close the file
 	infile.close();
 }
 
