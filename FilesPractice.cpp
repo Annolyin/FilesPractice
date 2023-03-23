@@ -12,15 +12,17 @@ struct Record {
 		int age;
 	};
 
-	int* index; //Array for record indexes
-	int recordCount; //num of records
-	std::string filename = "testData.dat";
+int* index; //Array for record indexes
+int recordCount; //num of records
+std::string filename = "testData.dat"; //file we want to work with
 
-	void CreateFile(string filename);
-	void IndexFile(string filename);
-	void PrintFile(string filename);
-	void PrintRecord(string filename, int index);
-	void PrintRecord(Record* r);
+
+//forward declaring functions
+void CreateFile(string filename);
+void IndexFile(string filename);
+void PrintFile(string filename);
+void PrintRecord(string filename, int index);
+void PrintRecord(Record* r);
 
 int main()
 {
