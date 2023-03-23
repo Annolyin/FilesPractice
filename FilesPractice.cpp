@@ -172,5 +172,5 @@ void PrintFile(string filename)
 
 void PrintRecord(Record* r)
 {
-	std::cout << "Name: "<< r->name << "Age: " << r->age << "\n";
+	std::cout << "Name: "<< r->name << " Age: " << r->age << "\n";
 }
